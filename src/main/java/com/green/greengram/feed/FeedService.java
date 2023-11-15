@@ -28,15 +28,19 @@ public class FeedService {
         return new ResVo(pDto.getIfeed());
     }
 
-    public List<FeedSelVo> getFeed(int page) {
+    public List<FeedSelVo> getFeed(int page, int iuser) {
         final int ROW_COUNT = 30;
         FeedSelDto dto = FeedSelDto.builder()
+                .iuser(iuser)
                 .startIdx((page - 1) * ROW_COUNT)
                 .rowCount(ROW_COUNT)
                 .build();
+
+        // 맵 : 중복 허용X 순서도 보장하지 않음.
+        // 순서 보장받으려면 LinkedHashMap 사용
         List<FeedSelVo> feedSelVoList = mapper.selFeed(dto);
         List<Integer> iFeedList = new ArrayList();
-        Map<Integer, FeedSelVo> feedMap = new HashMap();
+        Map<Integer, FeedSelVo> feedMap = new HashMap(); // MAP<key, Value>
         for(FeedSelVo vo : feedSelVoList) {
             System.out.println(vo);
             iFeedList.add(vo.getIfeed());
@@ -44,6 +48,7 @@ public class FeedService {
         }
         System.out.println("--------------");
         if(iFeedList.size() > 0) {
+
             List<FeedPicsVo> feedPicsList = mapper.selFeedPics(iFeedList);
 
             for(FeedPicsVo vo : feedPicsList) {
@@ -53,7 +58,21 @@ public class FeedService {
                 strPicsList.add(vo.getPic());
             }
         }
-
         return feedSelVoList;
+    }
+
+    // 1. 아래 (FeedFavProcDto dto)에있는 파라미터로 데이터가 들어와서
+    // 2. { 구현부에서 가공해서 다시 리턴해서 보냄 }
+    public ResVo procFav(FeedFavProcDto dto){
+        int result = mapper.delFeedFav(dto);
+
+        if (result == 0){
+            mapper.insFeedFav(dto);
+            return new ResVo(1);
+
+        } else if (result == 1){
+            return new ResVo(2);
+        }
+        return null;
     }
 }

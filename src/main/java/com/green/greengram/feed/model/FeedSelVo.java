@@ -13,5 +13,6 @@ public class FeedSelVo {
     private int iuser; // 작성자 pk
     private String writer; //작성자 이름
     private String createdAt; //피드 등록 날짜
+    private int isFav;
     private List<String> pics = new ArrayList();
 }

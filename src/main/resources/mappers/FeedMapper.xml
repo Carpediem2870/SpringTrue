@@ -12,10 +12,16 @@
 
     <select id="selFeed">
         SELECT A.ifeed, A.contents, A.location, A.created_at as createdAt
-             , B.iuser, B.nm as writer
+            , B.iuser, B.nm as writer
+            , if(C.ifeed > 0, 1, 0) AS isFav
+        <!--if( 조건, true값, false값) -->
+        <!-- ifnull(C.ifeed ,0) AS isFav -->
         FROM t_feed A
-        INNER JOIN t_user B
+        JOIN t_user B
         ON A.iuser = B.iuser
+        LEFT JOIN t_favorite C
+        ON A.ifeed = C.ifeed
+        AND C.iuser = #{iuser}
         ORDER BY A.ifeed DESC
         LIMIT #{startIdx}, #{rowCount}
     </select>
@@ -23,7 +29,6 @@
 
 
     <!--  ["a", "b", "c"]  -->
-
     <!-- t_feed_pics  -->
     <insert id="insFeedPic">
         INSERT INTO t_feed_pics
@@ -32,7 +37,9 @@
         <foreach collection="pics" item="pic" open="(" close=")" separator="),(">
             #{ifeed}, #{pic}
         </foreach>
+
     </insert>
+
     <!--  [1, 2, 3]  -->
     <select id="selFeedPics">
         SELECT ifeed, pic
@@ -42,4 +49,20 @@
             #{ifeed}
         </foreach>
     </select>
+
+
+    <!-- t_favorite-->
+    <delete id="delFeedFav">
+        DELETE
+        FROM t_favorite
+        WHERE ifeed = #{ifeed} and iuser = #{iuser}
+    </delete>
+
+    <insert id="insFeedFav">
+        INSERT INTO t_favorite
+        (ifeed, iuser)
+        VALUES
+        (#{ifeed}, #{iuser})
+    </insert>
+
 </mapper>

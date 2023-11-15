@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.green.greengram.feed.FeedMapper">
+    <insert id="insFeed"
+            useGeneratedKeys="true"
+            keyProperty="ifeed">
+        INSERT INTO t_feed
+        SET iuser = #{iuser}
+        , contents = #{contents}
+        , location = #{location}
+    </insert>
+
+    <select id="selFeed">
+        SELECT A.ifeed, A.contents, A.location, A.created_at as createdAt
+             , B.iuser, B.nm as writer
+        FROM t_feed A
+        INNER JOIN t_user B
+        ON A.iuser = B.iuser
+        ORDER BY A.ifeed DESC
+        LIMIT #{startIdx}, #{rowCount}
+    </select>
+
+
+
+    <!--  ["a", "b", "c"]  -->
+
+    <!-- t_feed_pics  -->
+    <insert id="insFeedPic">
+        INSERT INTO t_feed_pics
+        (ifeed, pic)
+        VALUES
+        <foreach collection="pics" item="pic" open="(" close=")" separator="),(">
+            #{ifeed}, #{pic}
+        </foreach>
+    </insert>
+    <!--  [1, 2, 3]  -->
+    <select id="selFeedPics">
+        SELECT ifeed, pic
+        FROM t_feed_pics
+        WHERE ifeed in
+        <foreach collection="list" item="ifeed" open="(" close=")" separator=",">
+            #{ifeed}
+        </foreach>
+    </select>
+</mapper>

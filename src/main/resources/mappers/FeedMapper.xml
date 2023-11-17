@@ -10,6 +10,8 @@
         , location = #{location}
     </insert>
 
+<!-- 아래 셀렉트 하나로 로그인한 iuser값, 내가 보고자하는 프로필 주인iuser 두개의 값이 필요-->
+    <!--프로필 주인iuser값이 없다면0, 있다면 쿼리문에서 사용-->
     <select id="selFeed">
         SELECT A.ifeed, A.contents, A.location, A.created_at as createdAt
             , B.iuser, B.nm as writer
@@ -21,7 +23,10 @@
         ON A.iuser = B.iuser
         LEFT JOIN t_favorite C
         ON A.ifeed = C.ifeed
-        AND C.iuser = #{iuser}
+        AND C.iuser = #{loginedIuser}
+        <if test="targetIuser > 0">
+            WHERE A.iuser = #{targetIuser}
+        </if>
         ORDER BY A.ifeed DESC
         LIMIT #{startIdx}, #{rowCount}
     </select>

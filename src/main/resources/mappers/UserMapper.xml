@@ -15,4 +15,21 @@
         SELECT iuser, upw, nm, pic FROM t_user
         WHERE uid = #{uid}
     </select>
+
+    <select id="selUserProfileInfo">
+
+        SELECT COUNT(a.ifeed) AS feedCnt, ifnull(b.favCnt, 0) AS favCnt, c.nm, c.created_at AS createdAt
+        FROM t_feed a
+        LEFT JOIN (
+        SELECT a.iuser, COUNT(a.ifeed) favCnt
+        FROM t_feed a
+        INNER JOIN t_favorite b
+        ON a.ifeed= b.ifeed
+        WHERE a.iuser= #{iuser}
+        ) b
+        ON a.iuser= b.iuser
+        JOIN t_user c
+        ON a.iuser = c.iuser
+        WHERE a.iuser= #{iuser};
+    </select>
 </mapper>

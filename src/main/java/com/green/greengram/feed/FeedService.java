@@ -28,30 +28,36 @@ public class FeedService {
         return new ResVo(pDto.getIfeed());
     }
 
-    public List<FeedSelVo> getFeed(int page, int iuser) {
+    public List<FeedSelVo> getFeed(int page, int loginedIuser, int targetIuser) {
         final int ROW_COUNT = 30;
+
+        // 해당하는 피드에 들어갔는지, 페이징
         FeedSelDto dto = FeedSelDto.builder()
-                .iuser(iuser)
+                .loginedIuser(loginedIuser)
+                .targetIuser(targetIuser)
                 .startIdx((page - 1) * ROW_COUNT)
                 .rowCount(ROW_COUNT)
                 .build();
 
         // 맵 : 중복 허용X 순서도 보장하지 않음.
         // 순서 보장받으려면 LinkedHashMap 사용
+
+        //모든 Feed 다 가지고옴
         List<FeedSelVo> feedSelVoList = mapper.selFeed(dto);
-        List<Integer> iFeedList = new ArrayList();
+        List<Integer> iFeedList = new ArrayList(); // iFeedList는 100~70번까지 ifeed값을 뽑는작업
         Map<Integer, FeedSelVo> feedMap = new HashMap(); // MAP<key, Value>
         for(FeedSelVo vo : feedSelVoList) {
             System.out.println(vo);
-            iFeedList.add(vo.getIfeed());
-            feedMap.put(vo.getIfeed(), vo);
+            iFeedList.add(vo.getIfeed()); // ifeed 값만 계속 뽑아내는중
+            feedMap.put(vo.getIfeed(), vo); // ifeed값으로 vo값(주소값)을 넣음
         }
         System.out.println("--------------");
         if(iFeedList.size() > 0) {
 
             List<FeedPicsVo> feedPicsList = mapper.selFeedPics(iFeedList);
+            //  ifeed 값을 보내주고 ifeed값의 사진만 feedPicsList로 보내줌
 
-            for(FeedPicsVo vo : feedPicsList) {
+            for(FeedPicsVo vo : feedPicsList) { // 가져온값의 사진 주소를 담음
                 System.out.println(vo);
                 FeedSelVo feedVo = feedMap.get(vo.getIfeed());
                 List<String> strPicsList = feedVo.getPics();

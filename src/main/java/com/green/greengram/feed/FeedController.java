@@ -23,10 +23,13 @@ public class FeedController {
 
     @GetMapping
     public List<FeedSelVo> getFeed(int page, int iuser) {
-
-
         System.out.println(page);
-        return service.getFeed(page, iuser);
+        return service.getFeed(page, iuser, 0); // 타겟유저가 없는 경우 0으로 사용
+    }
+
+    @GetMapping("/{targetIuser}")
+    public List<FeedSelVo> getProfileFeed(@PathVariable int targetIuser, int page, int loginedIuser) {
+        return service.getFeed(page, loginedIuser, targetIuser); // 타겟유저가 없는 경우 0으로 사용
     }
 
     @GetMapping("/{ifeed}/fav")
@@ -37,4 +40,6 @@ public class FeedController {
                 .build();
         return service.procFav(dto);
     }
+
+
 }
